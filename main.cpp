@@ -1,5 +1,6 @@
 #include <iostream>
 #include "build/libs/sdl2/include/SDL.h"
+#include "include/InterpolatedFunctions.h"
 
 using namespace std;
 

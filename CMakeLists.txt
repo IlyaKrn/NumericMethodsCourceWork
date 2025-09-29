@@ -11,6 +11,8 @@ add_subdirectory(${CMAKE_BINARY_DIR}/libs/sdl2 sdl2)
 
 add_executable(main
         main.cpp
+        include/InterpolatedFunctions.h
+        src/InterpolatedFunctions.cpp
 )
 
 target_link_libraries(main SDL2)
