@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 
     //размеры окна и размер клетки
     int HEIGHT = 1000;
-    int WIDTH = 1000;
+    int WIDTH = 1500;
     int SCALE = 50;
 
     //перезаписываем параметры окна из аргументов программы
@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     vector<node> nodes = getNodes("/home/ilyakrn/CLionProjects/NumericalMethodsCourceWork/nodes.txt");
 
     //открываем окно и получаем матрицу пикселей
-    SDL_Window* window = SDL_CreateWindow("Курсовая работа Численные методы", 0, 0, HEIGHT, WIDTH , 0);
+    SDL_Window* window = SDL_CreateWindow("Курсовая работа Численные методы", 0, 0, WIDTH, HEIGHT, 0);
     Uint32* pixels = (Uint32*) SDL_GetWindowSurface(window)->pixels;
 
     //рисуем белый фон
