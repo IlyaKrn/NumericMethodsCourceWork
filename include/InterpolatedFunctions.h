@@ -1,5 +1,12 @@
 #pragma once
+#include <vector>
 
-float* linearInterpolation(float x, float* nodes, int nodesCount, int* valuesCount);
-float* lagrangeInterpolation(float x, float* nodes, int nodesCount, int* valuesCount);
-float* newtonInterpolation(float x, float* nodes, int nodesCount, int* valuesCount);
+
+struct node {
+    float x;
+    float y;
+};
+
+std::vector<float> linearInterpolation(float x, std::vector<node> nodes);
+std::vector<float> lagrangeInterpolation(float x, std::vector<node> nodes);
+std::vector<float> newtonInterpolation(float x, std::vector<node> nodes);

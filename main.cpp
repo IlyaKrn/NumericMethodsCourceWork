@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "build/libs/sdl2/include/SDL.h"
 #include "include/InterpolatedFunctions.h"
 
@@ -57,8 +58,10 @@ int main(int argc, char** argv) {
     cout << "field: " << HEIGHT << "x" << WIDTH << "\ncell= " << SCALE << endl;
 
     //получаем список узлов
-    float nodes[8] = {0, 0, 1, 1, 2, 0, 3, 1};
-    int nodesCount = 4;
+    vector<node> nodes;
+    nodes.push_back({0, 0});
+    nodes.push_back({1, 1});
+    nodes.push_back({3, 0});
 
     //открываем окно и получаем матрицу пикселей
     SDL_Window* window = SDL_CreateWindow("Курсовая работа Численные методы", 0, 0, HEIGHT, WIDTH , 0);
@@ -88,11 +91,10 @@ int main(int argc, char** argv) {
             float curX = x - WIDTH / 2;
 
             //получаем координаты точек для текущего x
-            int valuesCount;
-            float* values = linearInterpolation(curX / SCALE, nodes, nodesCount, &valuesCount);
+            vector<float> values = linearInterpolation(curX / SCALE, nodes);
 
             //рисуем точки функции
-            for (int i = 0; i < valuesCount; ++i) {
+            for (int i = 0; i < values.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
                 float y = - values[i] * SCALE + HEIGHT / 2;
                 //рисуем если помещается на поле
@@ -100,8 +102,6 @@ int main(int argc, char** argv) {
                     pixels[((int) y) * WIDTH + x] = COLOR_BLACK;
                 }
             }
-
-            delete[] values;
         }
 
 
