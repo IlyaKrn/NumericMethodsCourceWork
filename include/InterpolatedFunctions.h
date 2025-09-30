@@ -1,5 +1,5 @@
 #pragma once
 
-void linearInterpolation(float x, float* nodes, int nodeCount, float* values, int* valuesCount);
-void lagrangeInterpolation(float x, float* nodes, int nodeCount, float* values, int* valuesCount);
-void newtonInterpolation(float x, float* nodes, int nodeCount, float* values, int* valuesCount);
+float* linearInterpolation(float x, float* nodes, int nodesCount, int* valuesCount);
+float* lagrangeInterpolation(float x, float* nodes, int nodesCount, int* valuesCount);
+float* newtonInterpolation(float x, float* nodes, int nodesCount, int* valuesCount);

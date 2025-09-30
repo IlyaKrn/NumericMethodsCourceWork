@@ -1,13 +1,16 @@
+#include <cstdlib>
+#include <valarray>
 #include "../include/InterpolatedFunctions.h"
 
-void linearInterpolation(float x, float* nodes, int nodeCount, float* values, int* valuesCount){
+float* linearInterpolation(float x, float* nodes, int nodeCount, int* valuesCount){
+    *valuesCount = 2;
+    return new float[2]{(float)sin(x), (float)cos(x)};
+}
+
+float* lagrangeInterpolation(float x, float* nodes, int nodeCount, int* valuesCount){
 
 }
 
-void lagrangeInterpolation(float x, float* nodes, int nodeCount, float* values, int* valuesCount){
-
-}
-
-void newtonInterpolation(float x, float* nodes, int nodeCount, float* values, int* valuesCount){
+float* newtonInterpolation(float x, float* nodes, int nodeCount, int* valuesCount){
 
 }

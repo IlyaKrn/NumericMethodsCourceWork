@@ -54,7 +54,11 @@ int main(int argc, char** argv) {
         try{ WIDTH = stoi(argv[1]);  } catch(...) {}
         try{ SCALE = stoi(argv[2]);  } catch(...) {}
     }
-    cout << "field: " << HEIGHT << "x" << WIDTH << "\n1 cell= " << SCALE << endl;
+    cout << "field: " << HEIGHT << "x" << WIDTH << "\ncell= " << SCALE << endl;
+
+    //получаем список узлов
+    float nodes[8] = {0, 0, 1, 1, 2, 0, 3, 1};
+    int nodesCount = 4;
 
     //открываем окно и получаем матрицу пикселей
     SDL_Window* window = SDL_CreateWindow("Курсовая работа Численные методы", 0, 0, HEIGHT, WIDTH , 0);
@@ -79,8 +83,26 @@ int main(int argc, char** argv) {
         drawField(pixels, HEIGHT, WIDTH, SCALE);
 
 
+        for (int x = 0; x < WIDTH; ++x) {
+            //считаем текущую координату x с поправкой на смещение осей
+            float curX = x - WIDTH / 2;
 
+            //получаем координаты точек для текущего x
+            int valuesCount;
+            float* values = linearInterpolation(curX / SCALE, nodes, nodesCount, &valuesCount);
 
+            //рисуем точки функции
+            for (int i = 0; i < valuesCount; ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                float y = - values[i] * SCALE + HEIGHT / 2;
+                //рисуем если помещается на поле
+                if(y >= 0 && y < HEIGHT) {
+                    pixels[((int) y) * WIDTH + x] = COLOR_BLACK;
+                }
+            }
+
+            delete[] values;
+        }
 
 
 
