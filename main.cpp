@@ -58,10 +58,7 @@ int main(int argc, char** argv) {
     cout << "field: " << HEIGHT << "x" << WIDTH << "\ncell= " << SCALE << endl;
 
     //получаем список узлов
-    vector<node> nodes;
-    nodes.push_back({0, 0});
-    nodes.push_back({1, 1});
-    nodes.push_back({3, 0});
+    vector<node> nodes = getNodes("/home/ilyakrn/CLionProjects/NumericalMethodsCourceWork/nodes.txt");
 
     //открываем окно и получаем матрицу пикселей
     SDL_Window* window = SDL_CreateWindow("Курсовая работа Численные методы", 0, 0, HEIGHT, WIDTH , 0);
@@ -88,7 +85,7 @@ int main(int argc, char** argv) {
 
         for (int x = 0; x < WIDTH; ++x) {
             //считаем текущую координату x с поправкой на смещение осей
-            float curX = x - WIDTH / 2;
+            float curX = x - SCALE;
 
             //получаем координаты точек для текущего x
             vector<float> values = linearInterpolation(curX / SCALE, nodes);
@@ -96,7 +93,7 @@ int main(int argc, char** argv) {
             //рисуем точки функции
             for (int i = 0; i < values.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
-                float y = - values[i] * SCALE + HEIGHT / 2;
+                float y = - values[i] * SCALE + SCALE;
                 //рисуем если помещается на поле
                 if(y >= 0 && y < HEIGHT) {
                     pixels[((int) y) * WIDTH + x] = COLOR_BLACK;
