@@ -4,12 +4,12 @@
 
 
 struct node {
-    float x;
-    float y;
+    long double x;
+    long double y;
 };
 
 std::vector<node> getNodes(std::string filePath);
 
-std::vector<float> linearInterpolation(float x, std::vector<node> nodes);
-std::vector<float> lagrangeInterpolation(float x, std::vector<node> nodes);
-std::vector<float> newtonInterpolation(float x, std::vector<node> nodes);
+std::vector<long double> linearInterpolation(long double x, std::vector<node> nodes);
+std::vector<long double> lagrangeInterpolation(long double x, std::vector<node> nodes);
+std::vector<long double> newtonInterpolation(long double x, std::vector<node> nodes);

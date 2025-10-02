@@ -18,7 +18,7 @@ void drawSurface(Uint32* pixels, int h, int w){
 
 //рисуем клетки и оси
 void drawField(Uint32* pixels, int h, int w, int s){
-    for (int i = 1; i < h / 2 - 1; ++i) {
+    for (int i = 0; i < h / 2 - 1; ++i) {
         if(i % s == 0) {
             for (int j = 0; j < w; ++j) {
                 pixels[(i + h / 2) * w + j] = COLOR_GRAY;
@@ -26,19 +26,13 @@ void drawField(Uint32* pixels, int h, int w, int s){
             }
         }
     }
-    for (int i = 1; i < w / 2 - 1; ++i) {
+    for (int i = 0; i < w / 2 - 1; ++i) {
         if(i % s == 0) {
             for (int j = 0; j < h; ++j) {
                 pixels[j * w + ((i + w / 2 - 1))] = COLOR_GRAY;
                 pixels[j * w + ((-i + w / 2 - 1))] = COLOR_GRAY;
             }
         }
-    }
-    for (int i = 0; i < h; ++i) {
-        pixels[i * w + w / 2] = COLOR_BLACK;
-    }
-    for (int i = 0; i < w; ++i) {
-        pixels[(h / 2 - 1) * w + i] = COLOR_BLACK;
     }
 }
 
@@ -82,23 +76,46 @@ int main(int argc, char** argv) {
         //рисуем клетки и оси
         drawField(pixels, HEIGHT, WIDTH, SCALE);
 
+        long double lastLinear = 0;
+        long double lastLagrange = 0;
+
 
         for (int x = 0; x < WIDTH; ++x) {
             //считаем текущую координату x с поправкой на смещение осей
             float curX = x - SCALE;
 
             //получаем координаты точек для текущего x
-            vector<float> values = linearInterpolation(curX / SCALE, nodes);
+            vector<long double> linear = linearInterpolation(curX / SCALE, nodes);
+            vector<long double> lagrange = lagrangeInterpolation(curX / SCALE, nodes);
 
             //рисуем точки функции
-            for (int i = 0; i < values.size(); ++i) {
+            for (int i = 0; i < linear.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
-                float y = - values[i] * SCALE + SCALE;
+                long double y = - linear[i] * SCALE + SCALE;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
                 //рисуем если помещается на поле
-                if(y >= 0 && y < HEIGHT) {
-                    pixels[((int) y) * WIDTH + x] = COLOR_BLACK;
+                for (int j = min(y, lastLinear); j <= max(y, lastLinear); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_GRAY;
+                    }
                 }
+                lastLinear = y;
             }
+            for (int i = 0; i < lagrange.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = - lagrange[i] * SCALE + SCALE;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastLagrange); j <= max(y, lastLagrange); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastLagrange = y;
+            }
+            SDL_UpdateWindowSurface(window);
         }
 
 
