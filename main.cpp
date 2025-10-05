@@ -93,7 +93,7 @@ int main(int argc, char** argv) {
             //рисуем точки функции
             for (int i = 0; i < linear.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
-                long double y = - linear[i] * SCALE + SCALE;
+                long double y = linear[i] * SCALE + SCALE;
                 if (y < 0) y = 0;
                 if (y >= HEIGHT) y = HEIGHT - 1;
                 //рисуем если помещается на поле
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
             }
             for (int i = 0; i < lagrange.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
-                long double y = - lagrange[i] * SCALE + SCALE;
+                long double y = lagrange[i] * SCALE + SCALE;
                 if (y < 0) y = 0;
                 if (y >= HEIGHT) y = HEIGHT - 1;
                 //рисуем если помещается на поле
@@ -119,7 +119,7 @@ int main(int argc, char** argv) {
             }
             for (int i = 0; i < newton.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
-                long double y = - newton[i] * SCALE + SCALE;
+                long double y = newton[i] * SCALE + SCALE;
                 if (y < 0) y = 0;
                 if (y >= HEIGHT) y = HEIGHT - 1;
                 //рисуем если помещается на поле
