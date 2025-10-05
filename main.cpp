@@ -78,6 +78,7 @@ int main(int argc, char** argv) {
 
         long double lastLinear = 0;
         long double lastLagrange = 0;
+        long double lastNewton = 0;
 
 
         for (int x = 0; x < WIDTH; ++x) {
@@ -87,6 +88,7 @@ int main(int argc, char** argv) {
             //получаем координаты точек для текущего x
             vector<long double> linear = linearInterpolation(curX / SCALE, nodes);
             vector<long double> lagrange = lagrangeInterpolation(curX / SCALE, nodes);
+            vector<long double> newton = newtonInterpolation(curX / SCALE, nodes);
 
             //рисуем точки функции
             for (int i = 0; i < linear.size(); ++i) {
@@ -114,6 +116,19 @@ int main(int argc, char** argv) {
                     }
                 }
                 lastLagrange = y;
+            }
+            for (int i = 0; i < newton.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = - newton[i] * SCALE + SCALE;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastNewton); j <= max(y, lastNewton); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastNewton = y;
             }
             SDL_UpdateWindowSurface(window);
         }
