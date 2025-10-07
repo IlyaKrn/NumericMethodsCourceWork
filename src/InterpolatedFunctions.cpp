@@ -44,27 +44,26 @@ vector<long double> lagrangeInterpolation(long double x, vector<node> nodes){
 
 vector<long double> newtonInterpolation(long double x, vector<node> nodes){
     vector<long double> values;
-//
-//    long double summValue = nodes[0].y;
-//    for (int i = 0; i < nodes.size() - 1; ++i) {
-//        long double proizv = 1;
-//        for (int j = 0; j < i; ++j) {
-//            proizv *= x - nodes[j].x;
-//        }
-//
-//        long double razdRaz = 1;
-//        for (int j = 0; j < i + 1; ++j) {
-//            long double znam = 1;
-//            for (int k = 0; k < i + 1; ++k) {
-//                if(k != j){
-//                    znam *= nodes[j].x - nodes[k].x;
-//                }
-//            }
-//            razdRaz += nodes[j].y / znam;
-//        }
-//
-//        summValue += proizv;
-//    }
-//    values.push_back(summValue);
+
+    long double summValue = nodes[0].y;
+    for (int i = 1; i < nodes.size(); ++i) {
+        long double proizv = 1;
+        for (int j = 0; j < i; ++j) {
+            proizv *= x - nodes[j].x;
+        }
+        long double razdRaz = 0;
+        for (int j = 0; j <= i; ++j) {
+            long double znam = 1;
+            for (int k = 0; k <= i; ++k) {
+                if(j != k) {
+                    znam *= nodes[j].x - nodes[k].x;
+                }
+            }
+            razdRaz += nodes[j].y / znam;
+        }
+
+        summValue += proizv * razdRaz;
+    }
+    values.push_back(summValue);
     return values;
 }
