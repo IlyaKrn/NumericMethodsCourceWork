@@ -38,7 +38,7 @@ vector<long double> lagrangeInterpolation(long double x, vector<node> nodes){
 
         summValue += nodes[i].y * proizv;
     }
-    values.push_back(summValue);
+//    values.push_back(summValue);
     return values;
 }
 
@@ -64,6 +64,12 @@ vector<long double> newtonInterpolation(long double x, vector<node> nodes){
 
         summValue += proizv * razdRaz;
     }
-    values.push_back(summValue);
+//    values.push_back(summValue);
+    return values;
+}
+
+vector<long double> splineInterpolation(long double x, vector<node> nodes){
+    vector<long double> values;
+
     return values;
 }
