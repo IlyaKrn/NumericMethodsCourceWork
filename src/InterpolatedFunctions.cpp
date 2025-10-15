@@ -1,5 +1,6 @@
 #include "../include/InterpolatedFunctions.h"
 #include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -70,6 +71,72 @@ vector<long double> newtonInterpolation(long double x, vector<node> nodes){
 
 vector<long double> splineInterpolation(long double x, vector<node> nodes){
     vector<long double> values;
+
+
+    //инициализируем матрицу
+    vector<vector<long double>> slau;
+    for (int i = 0; i < nodes.size(); ++i) {
+        vector<long double> row;
+        for (int j = 0; j < nodes.size(); ++j) {
+            row.push_back(0);
+        }
+        slau.push_back(row);
+    }
+    //заполняем матрицу
+    slau[0][0] = 1;
+    slau[nodes.size() - 1][nodes.size() - 1] = 1;
+    for (int i = 1; i < nodes.size() - 1; ++i) {
+        slau[i][i-1] = nodes[i].x - nodes[i - 1].x;
+        slau[i][i+1] = nodes[i + 1].x - nodes[i].x;
+        slau[i][i] = 2 * (slau[i][i-1] + slau[i][i+1]);
+    }
+
+    //считаем правую часть и добавляем в матрицу
+    slau[0].push_back(0);
+    for (int i = 1; i < nodes.size() - 1; ++i){
+        slau[i].push_back(3 * ((nodes[i + 1].y - nodes[i].y)/ (nodes[i + 1].x - nodes[i].x) - (nodes[i].y - nodes[i - 1].y) / (nodes[i].x - nodes[i - 1].x)));
+    }
+    slau[slau.size() - 1].push_back(0);
+
+    //зануляем столбцы
+    for (int row = 1; row < nodes.size(); ++row) {
+        for (int i = row; i < slau.size(); ++i) {
+            long double mnozh = slau[i][row-1] / slau[row-1][row-1];
+            for (int j = row-1; j < slau[0].size(); ++j) {
+                slau[i][j] -= mnozh * slau[row-1][j];
+            }
+            slau[i][row-1] = 0;
+        }
+    }
+
+    vector<long double> c;
+
+
+
+
+
+    long double a3 = (slau[3][4]) / slau[3][3];
+    long double a2 = (slau[2][4] - a3 *  slau[2][3]) / slau[2][2];
+    long double a1 = (slau[1][4] - a3 *  slau[1][3] - a2 *  slau[1][2]) / slau[1][1];
+    long double a0 = (slau[0][4] - a3 *  slau[0][3] - a2 *  slau[0][2] - a1 * slau[0][1]) / slau[0][0];
+    c.push_back(a0);
+    c.push_back(a1);
+    c.push_back(a2);
+    c.push_back(a3);
+
+
+    cout << endl;
+    for (int j = 0; j < c.size(); ++j) {
+        cout << c[j] << " ";
+    }
+
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        if (min(nodes[i].x, nodes[i + 1].x) <= x && max(nodes[i].x, nodes[i + 1].x) > x){
+            long double d = (c[i+1] - c[i]) / (3 * (nodes[i + 1].x - nodes[i].x));
+            long double b = (nodes[i+1].y - nodes[i].y) / (nodes[i + 1].x - nodes[i].x) - (nodes[i + 1].x - nodes[i].x) * (2 * c[i] + c[i+1]) / 3;
+            values.push_back(nodes[i].y + b * (x - nodes[i].x) + c[i] * (x - nodes[i].x) * (x - nodes[i].x) + d * (x - nodes[i].x) * (x - nodes[i].x) * (x - nodes[i].x));
+        }
+    }
 
     return values;
 }
