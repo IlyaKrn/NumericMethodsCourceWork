@@ -110,24 +110,16 @@ vector<long double> splineInterpolation(long double x, vector<node> nodes){
     }
 
     vector<long double> c;
+    for (int i = 0; i < nodes.size(); ++i) {
+        c.push_back(0);
+    }
 
-
-
-
-
-    long double a3 = (slau[3][4]) / slau[3][3];
-    long double a2 = (slau[2][4] - a3 *  slau[2][3]) / slau[2][2];
-    long double a1 = (slau[1][4] - a3 *  slau[1][3] - a2 *  slau[1][2]) / slau[1][1];
-    long double a0 = (slau[0][4] - a3 *  slau[0][3] - a2 *  slau[0][2] - a1 * slau[0][1]) / slau[0][0];
-    c.push_back(a0);
-    c.push_back(a1);
-    c.push_back(a2);
-    c.push_back(a3);
-
-
-    cout << endl;
-    for (int j = 0; j < c.size(); ++j) {
-        cout << c[j] << " ";
+    for (int i = nodes.size() - 1; i >= 0; --i) {
+        long double sum = 0;
+        for (int j = 0; j < c.size(); ++j) {
+            sum += c[j] * slau[i][j];
+        }
+        c[i] = (slau[i][slau[i].size() - 1] - sum) / slau[i][i];
     }
 
     for (int i = 0; i < nodes.size() - 1; ++i){
