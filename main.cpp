@@ -7,6 +7,7 @@ using namespace std;
 
 const int COLOR_WHITE = 2147483647;
 const int COLOR_GRAY = 1002159035;
+const int COLOR_RED = 16711680;
 const int COLOR_BLACK = 0;
 
 //рисуем белый фон
@@ -34,6 +35,38 @@ void drawField(Uint32* pixels, int h, int w, int s){
             }
         }
     }
+    for (int i = 0; i < w; ++i) {
+        pixels[s * w + i] = COLOR_BLACK;
+    }
+    for (int i = 0; i < h; ++i) {
+        pixels[i * w + s] = COLOR_BLACK;
+    }
+
+    //рисуем буквы
+    int size = s * 6 / 10;
+
+    for (int j = 0; j < 3; ++j) {
+        for (int k = 0; k < 3; ++k) {
+            for (int i = 0; i < size; i++) {
+                pixels[(s / 5 + i + j - 2) * w + k + w / 2 + s / 5 + i] = COLOR_BLACK;
+                pixels[(s / 5 + i + j - 2) * w + k + w / 2 + s / 5 + size - 1 - i] = COLOR_BLACK;
+            }
+        }
+    }
+
+    for (int j = 0; j < 3; ++j) {
+        for (int k = 0; k < 3; ++k) {
+            for (int i = 0; i < size / 2; i++) {
+                pixels[(h / 2 + s / 5 + i + j - 2) * w + k + s / 5 + i] = COLOR_BLACK;
+                pixels[(h / 2 + s / 5 + i + j - 2) * w + k + s / 5 + size - 1 - i] = COLOR_BLACK;
+            }
+            for (int i = size / 2; i < size; i++) {
+                pixels[(h / 2 + s / 5 + i + j - 2) * w + k + s / 5 + size / 2] = COLOR_BLACK;
+            }
+        }
+    }
+
+
 }
 
 int main(int argc, char** argv) {
@@ -52,7 +85,7 @@ int main(int argc, char** argv) {
     cout << "field: " << HEIGHT << "x" << WIDTH << "\ncell= " << SCALE << endl;
 
     //получаем список узлов
-    vector<node> nodes = getNodes("/home/ilyakrn/CLionProjects/NumericalMethodsCourceWork/nodes.txt");
+    vector<node> nodes = getNodes("/home/ilyakrn/CLionProjects/NumericMethodsCourceWork/nodes.txt");
 
     //открываем окно и получаем матрицу пикселей
     SDL_Window* window = SDL_CreateWindow("Курсовая работа Численные методы", 0, 0, WIDTH, HEIGHT, 0);
@@ -101,7 +134,11 @@ int main(int argc, char** argv) {
                 //рисуем если помещается на поле
                 for (int j = min(y, lastLinear); j <= max(y, lastLinear); ++j) {
                     if(j >= 0 && j < HEIGHT) {
-                        pixels[((int) j) * WIDTH + x] = COLOR_GRAY;
+                        for (int k = -1; k < 2; ++k) {
+                            for (int l = -1; l < 2; ++l) {
+                                pixels[((int) j + k) * WIDTH + x + l] = COLOR_RED;
+                            }
+                        }
                     }
                 }
                 lastLinear = y;
@@ -140,7 +177,11 @@ int main(int argc, char** argv) {
                 //рисуем если помещается на поле
                 for (int j = min(y, lastSpline); j <= max(y, lastSpline); ++j) {
                     if(j >= 0 && j < HEIGHT) {
-                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                        for (int k = -1; k < 1; ++k) {
+                            for (int l = -1; l < 1; ++l) {
+                                pixels[((int) j + k) * WIDTH + x + l] = COLOR_BLACK;
+                            }
+                        }
                     }
                 }
                 lastSpline = y;
