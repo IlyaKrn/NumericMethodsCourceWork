@@ -14,3 +14,6 @@ std::vector<long double> linearInterpolation(long double x, std::vector<node> no
 std::vector<long double> lagrangeInterpolation(long double x, std::vector<node> nodes);
 std::vector<long double> newtonInterpolation(long double x, std::vector<node> nodes);
 std::vector<long double> splineInterpolation(long double x, std::vector<node> nodes);
+std::vector<long double> diffForward(long double x, std::vector<node> nodes);
+std::vector<long double> diffBackward(long double x, std::vector<node> nodes);
+std::vector<long double> diffCentral(long double x, std::vector<node> nodes);

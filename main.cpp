@@ -36,7 +36,7 @@ void drawField(Uint32* pixels, int h, int w, int s){
         }
     }
     for (int i = 0; i < w; ++i) {
-        pixels[s * w + i] = COLOR_BLACK;
+        pixels[(h / 2) * w + i] = COLOR_BLACK;
     }
     for (int i = 0; i < h; ++i) {
         pixels[i * w + s] = COLOR_BLACK;
@@ -74,7 +74,7 @@ int main(int argc, char** argv) {
     //размеры окна и размер клетки
     int HEIGHT = 1000;
     int WIDTH = 1500;
-    int SCALE = 50;
+    int SCALE = 25;
 
     //перезаписываем параметры окна из аргументов программы
     if(argc == 3){
@@ -113,6 +113,9 @@ int main(int argc, char** argv) {
         long double lastLagrange = 0;
         long double lastNewton = 0;
         long double lastSpline = 0;
+        long double lastDiffF = 0;
+        long double lastDiffB = 0;
+        long double lastDiffC = 0;
 
 
         for (int x = 0; x < WIDTH; ++x) {
@@ -124,11 +127,14 @@ int main(int argc, char** argv) {
             vector<long double> lagrange = lagrangeInterpolation(curX / SCALE, nodes);
             vector<long double> newton = newtonInterpolation(curX / SCALE, nodes);
             vector<long double> spline = splineInterpolation(curX / SCALE, nodes);
+            vector<long double> diffF = diffForward(curX / SCALE, nodes);
+            vector<long double> diffB = diffBackward(curX / SCALE, nodes);
+            vector<long double> diffC = diffCentral(curX / SCALE, nodes);
 
             //рисуем точки функции
             for (int i = 0; i < linear.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей
-                long double y = linear[i] * SCALE + SCALE;
+                long double y = linear[i] * SCALE + HEIGHT / 2;
                 if (y < 0) y = 0;
                 if (y >= HEIGHT) y = HEIGHT - 1;
                 //рисуем если помещается на поле
@@ -186,6 +192,46 @@ int main(int argc, char** argv) {
                 }
                 lastSpline = y;
             }
+            for (int i = 0; i < diffF.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = diffF[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastDiffF); j <= max(y, lastDiffF); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastDiffF = y;
+            }
+            for (int i = 0; i < diffB.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = diffB[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastDiffB); j <= max(y, lastDiffB); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastDiffB = y;
+            }
+            for (int i = 0; i < diffC.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = diffC[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastDiffC); j <= max(y, lastDiffC); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastDiffC = y;
+            }
+
             SDL_UpdateWindowSurface(window);
         }
 
