@@ -116,6 +116,9 @@ int main(int argc, char** argv) {
         long double lastDiffF = 0;
         long double lastDiffB = 0;
         long double lastDiffC = 0;
+        long double lastIntF = 0;
+        long double lastIntB = 0;
+        long double lastIntC = 0;
 
 
         for (int x = 0; x < WIDTH; ++x) {
@@ -130,6 +133,9 @@ int main(int argc, char** argv) {
             vector<long double> diffF = diffForward(curX / SCALE, nodes);
             vector<long double> diffB = diffBackward(curX / SCALE, nodes);
             vector<long double> diffC = diffCentral(curX / SCALE, nodes);
+            vector<long double> intF = integralLeft(curX / SCALE, nodes);
+            vector<long double> intB = integralRight(curX / SCALE, nodes);
+            vector<long double> intC = integralCentral(curX / SCALE, nodes);
 
             //рисуем точки функции
             for (int i = 0; i < linear.size(); ++i) {
@@ -230,6 +236,63 @@ int main(int argc, char** argv) {
                     }
                 }
                 lastDiffC = y;
+            }
+            for (int i = 0; i < intF.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = intF[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastIntF); j <= max(y, lastIntF); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                //рисуем полосы до нуля
+                for (int j = min(y, (long double) HEIGHT / 2); j <= max(y, (long double) HEIGHT / 2); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastIntF = y;
+            }
+            for (int i = 0; i < intB.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = intB[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastIntB); j <= max(y, lastIntB); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                //рисуем полосы до нуля
+                for (int j = min(y, (long double) HEIGHT / 2); j <= max(y, (long double) HEIGHT / 2); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastIntB = y;
+            }
+            for (int i = 0; i < intC.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = intC[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastIntC); j <= max(y, lastIntC); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                //рисуем полосы до нуля
+                for (int j = min(y, (long double) HEIGHT / 2); j <= max(y, (long double) HEIGHT / 2); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastIntC = y;
             }
 
             SDL_UpdateWindowSurface(window);

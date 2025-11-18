@@ -175,7 +175,58 @@ vector<long double> diffCentral(long double x, vector<node> nodes){
 
     for (int i = 1; i < diffs.size(); ++i){
         if (nodes[i].x <= x && nodes[i + 1].x > x){
-            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
+//            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
+        }
+    }
+    return values;
+}
+
+vector<long double> integralLeft(long double x, vector<node> nodes){
+    vector<long double> values;
+    long double quadr = 0;
+
+    for (int i = 0; i < nodes.size() - 1; ++i) {
+        quadr += nodes[i].y * (nodes[i + 1].x - nodes[i].x);
+    }
+    cout << "left quadr = " << quadr << endl;
+
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        if (nodes[i].x <= x && nodes[i + 1].x > x){
+//            values.push_back(nodes[i].y);
+        }
+    }
+    return values;
+}
+
+vector<long double> integralRight(long double x, vector<node> nodes){
+    vector<long double> values;
+    long double quadr = 0;
+
+    for (int i = 0; i < nodes.size() - 1; ++i) {
+        quadr += nodes[i + 1].y * (nodes[i + 1].x - nodes[i].x);
+    }
+    cout << "right quadr = " << quadr << endl;
+
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        if (nodes[i].x <= x && nodes[i + 1].x > x){
+//            values.push_back(nodes[i + 1].y);
+        }
+    }
+    return values;
+}
+
+vector<long double> integralCentral(long double x, vector<node> nodes){
+    vector<long double> values;
+    long double quadr = 0;
+
+    for (int i = 0; i < nodes.size() - 2; i+=2) {
+        quadr += nodes[i + 1].y * (nodes[i + 2].x - nodes[i].x) / 2;
+    }
+    cout << "central quadr = " << quadr << endl;
+
+    for (int i = 1; i < nodes.size() - 1; i+=2){
+        if (nodes[i - 1].x <= x && nodes[i + 1].x > x){
+            values.push_back(nodes[i].y);
         }
     }
     return values;
