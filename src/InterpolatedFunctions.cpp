@@ -220,13 +220,30 @@ vector<long double> integralCentral(long double x, vector<node> nodes){
     long double quadr = 0;
 
     for (int i = 0; i < nodes.size() - 2; i+=2) {
-        quadr += nodes[i + 1].y * (nodes[i + 2].x - nodes[i].x) / 2;
+        quadr += nodes[i + 1].y * (nodes[i + 2].x - nodes[i].x);
     }
     cout << "central quadr = " << quadr << endl;
 
     for (int i = 1; i < nodes.size() - 1; i+=2){
         if (nodes[i - 1].x <= x && nodes[i + 1].x > x){
-            values.push_back(nodes[i].y);
+//            values.push_back(nodes[i].y);
+        }
+    }
+    return values;
+}
+
+vector<long double> integralTrap(long double x, vector<node> nodes){
+    vector<long double> values;
+    long double quadr = 0;
+
+    for (int i = 0; i < nodes.size() - 1; ++i) {
+        quadr += (nodes[i].y + nodes[i + 1].y) * (nodes[i + 1].x - nodes[i].x) / 2;
+    }
+    cout << "trapetz quadr = " << quadr << endl;
+
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        if (min(nodes[i].x, nodes[i + 1].x) <= x && max(nodes[i].x, nodes[i + 1].x) > x){
+//            values.push_back(((x - nodes[i].x) * (nodes[i + 1].y - nodes[i].y)) / (nodes[i + 1].x - nodes[i].x) + nodes[i].y);
         }
     }
     return values;
