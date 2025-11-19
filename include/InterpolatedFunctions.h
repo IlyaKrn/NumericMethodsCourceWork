@@ -21,3 +21,4 @@ std::vector<long double> integralLeft(long double x, std::vector<node> nodes);
 std::vector<long double> integralRight(long double x, std::vector<node> nodes);
 std::vector<long double> integralCentral(long double x, std::vector<node> nodes);
 std::vector<long double> integralTrap(long double x, std::vector<node> nodes);
+std::vector<long double> integralSimpson(long double x, std::vector<node> nodes);

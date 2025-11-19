@@ -248,3 +248,55 @@ vector<long double> integralTrap(long double x, vector<node> nodes){
     }
     return values;
 }
+
+vector<long double> integralSimpson(long double x, vector<node> nodes){
+    vector<long double> values;
+    long double quadr = 0;
+
+    for (int i = 0; i < nodes.size() - 2; i+=2) {
+        quadr += (nodes[i + 2].x - nodes[i].x) * (nodes[i].y + 4 * nodes[i + 1].y + nodes[i + 2].y) / 6;
+    }
+    cout << "simpson quadr = " << quadr << endl;
+
+    for (int i = 1; i < nodes.size() - 1; i+=2){
+        if (nodes[i - 1].x <= x && nodes[i + 1].x > x){
+
+            long double slau[3][4] = {
+                    {nodes[i].x * nodes[i].x             ,nodes[i].x        , 1,     nodes[i].y        },
+                    {nodes[i + 1].x * nodes[i + 1].x     ,nodes[i + 1].x    , 1,     nodes[i + 1].y    },
+                    {nodes[i - 1].x * nodes[i - 1].x     ,nodes[i - 1].x    , 1,     nodes[i - 1].y    },
+            };
+
+            long double a0 = 0;
+            long double a1 = 0;
+            long double a2 = 0;
+
+            //решаем слау
+
+            //зануляем столбцы
+            for (int i = 1; i < 3; ++i) {
+                long double mnozh = slau[i][0] / slau[0][0];
+                for (int j = 0; j < 4; ++j) {
+                    slau[i][j] -= mnozh * slau[0][j];
+                }
+                slau[i][0] = 0;
+            }
+            for (int i = 2; i < 3; ++i) {
+                long double mnozh = slau[i][1] / slau[1][1];
+                for (int j = 1; j < 4; ++j) {
+                    slau[i][j] -= mnozh * slau[1][j];
+                }
+                slau[i][1] = 0;
+            }
+
+            //считаем ответ
+            a0 = (slau[2][3]) / slau[2][2];
+            a1 = (slau[1][3] - a0 *  slau[1][2]) / slau[1][1];
+            a2 = (slau[0][3] - a0 *  slau[0][2] - a1 *  slau[0][1]) / slau[0][0];
+
+
+            values.push_back(a0 + a1*x + a2*x*x);
+        }
+    }
+    return values;
+}
