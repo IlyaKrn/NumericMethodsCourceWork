@@ -116,6 +116,9 @@ int main(int argc, char** argv) {
         long double lastDiffF = 0;
         long double lastDiffB = 0;
         long double lastDiffC = 0;
+        long double lastHDiffF = 0;
+        long double lastHDiffB = 0;
+        long double lastHDiffC = 0;
         long double lastIntF = 0;
         long double lastIntB = 0;
         long double lastIntC = 0;
@@ -135,6 +138,9 @@ int main(int argc, char** argv) {
             vector<long double> diffF = diffForward(curX / SCALE, nodes);
             vector<long double> diffB = diffBackward(curX / SCALE, nodes);
             vector<long double> diffC = diffCentral(curX / SCALE, nodes);
+            vector<long double> hdiffF = hdiffForward(curX / SCALE, nodes);
+            vector<long double> hdiffB = hdiffBackward(curX / SCALE, nodes);
+            vector<long double> hdiffC = hdiffCentral(curX / SCALE, nodes);
             vector<long double> intF = integralLeft(curX / SCALE, nodes);
             vector<long double> intB = integralRight(curX / SCALE, nodes);
             vector<long double> intC = integralCentral(curX / SCALE, nodes);
@@ -240,6 +246,45 @@ int main(int argc, char** argv) {
                     }
                 }
                 lastDiffC = y;
+            }
+            for (int i = 0; i < hdiffF.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = hdiffF[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastHDiffF); j <= max(y, lastHDiffF); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastHDiffF = y;
+            }
+            for (int i = 0; i < hdiffB.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = hdiffB[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastHDiffB); j <= max(y, lastHDiffB); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastHDiffB = y;
+            }
+            for (int i = 0; i < hdiffC.size(); ++i) {
+                //вычисляем значение функции с поправкой на смещение осей
+                long double y = hdiffC[i] * SCALE + HEIGHT / 2;
+                if (y < 0) y = 0;
+                if (y >= HEIGHT) y = HEIGHT - 1;
+                //рисуем если помещается на поле
+                for (int j = min(y, lastHDiffC); j <= max(y, lastHDiffC); ++j) {
+                    if(j >= 0 && j < HEIGHT) {
+                        pixels[((int) j) * WIDTH + x] = COLOR_BLACK;
+                    }
+                }
+                lastHDiffC = y;
             }
             for (int i = 0; i < intF.size(); ++i) {
                 //вычисляем значение функции с поправкой на смещение осей

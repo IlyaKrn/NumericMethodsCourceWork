@@ -181,6 +181,57 @@ vector<long double> diffCentral(long double x, vector<node> nodes){
     return values;
 }
 
+vector<long double> hdiffForward(long double x, vector<node> nodes){
+    vector<long double> values;
+    vector<long double> diffs;
+    long double h = 0.001;
+
+    for (int i = 0; i < nodes.size() - 1; ++i) {
+        diffs.push_back((nodes[i + 1].y - nodes[i].y) / (nodes[i + 1].x - nodes[i].x));
+    }
+
+    for (int i = 0; i < diffs.size() - 1; ++i){
+        if (nodes[i].x <= x && nodes[i + 1].x > x){
+            values.push_back(((x - nodes[i].x) * (diffs[i + 1] - diffs[i])) / (nodes[i + 1].x - nodes[i].x) + diffs[i]);
+        }
+    }
+    return values;
+}
+
+vector<long double> hdiffBackward(long double x, vector<node> nodes){
+    vector<long double> values;
+    vector<long double> diffs;
+    long double h = 0.001;
+
+    for (int i = 1; i < nodes.size(); ++i) {
+        diffs.push_back((nodes[i].y - nodes[i - 1].y) / (nodes[i].x - nodes[i - 1].x));
+    }
+
+    for (int i = 1; i < diffs.size(); ++i){
+        if (nodes[i].x <= x && nodes[i + 1].x > x){
+            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
+        }
+    }
+    return values;
+}
+
+vector<long double> hdiffCentral(long double x, vector<node> nodes){
+    vector<long double> values;
+    vector<long double> diffs;
+    long double h = 0.001;
+
+    for (int i = 1; i < nodes.size() - 1; ++i) {
+        diffs.push_back((nodes[i + 1].y - nodes[i - 1].y) / (nodes[i + 1].x - nodes[i - 1].x));
+    }
+
+    for (int i = 1; i < diffs.size(); ++i){
+        if (nodes[i].x <= x && nodes[i + 1].x > x){
+            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
+        }
+    }
+    return values;
+}
+
 vector<long double> integralLeft(long double x, vector<node> nodes){
     vector<long double> values;
     long double quadr = 0;
@@ -295,7 +346,7 @@ vector<long double> integralSimpson(long double x, vector<node> nodes){
             a2 = (slau[0][3] - a0 *  slau[0][2] - a1 *  slau[0][1]) / slau[0][0];
 
 
-            values.push_back(a0 + a1*x + a2*x*x);
+//            values.push_back(a0 + a1*x + a2*x*x);
         }
     }
     return values;

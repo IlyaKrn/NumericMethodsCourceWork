@@ -17,6 +17,9 @@ std::vector<long double> splineInterpolation(long double x, std::vector<node> no
 std::vector<long double> diffForward(long double x, std::vector<node> nodes);
 std::vector<long double> diffBackward(long double x, std::vector<node> nodes);
 std::vector<long double> diffCentral(long double x, std::vector<node> nodes);
+std::vector<long double> hdiffForward(long double x, std::vector<node> nodes);
+std::vector<long double> hdiffBackward(long double x, std::vector<node> nodes);
+std::vector<long double> hdiffCentral(long double x, std::vector<node> nodes);
 std::vector<long double> integralLeft(long double x, std::vector<node> nodes);
 std::vector<long double> integralRight(long double x, std::vector<node> nodes);
 std::vector<long double> integralCentral(long double x, std::vector<node> nodes);
