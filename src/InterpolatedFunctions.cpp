@@ -126,7 +126,7 @@ vector<long double> splineInterpolation(long double x, vector<node> nodes){
         if (min(nodes[i].x, nodes[i + 1].x) <= x && max(nodes[i].x, nodes[i + 1].x) > x){
             long double d = (c[i+1] - c[i]) / (3 * (nodes[i + 1].x - nodes[i].x));
             long double b = (nodes[i+1].y - nodes[i].y) / (nodes[i + 1].x - nodes[i].x) - (nodes[i + 1].x - nodes[i].x) * (2 * c[i] + c[i+1]) / 3;
-//            values.push_back(nodes[i].y + b * (x - nodes[i].x) + c[i] * (x - nodes[i].x) * (x - nodes[i].x) + d * (x - nodes[i].x) * (x - nodes[i].x) * (x - nodes[i].x));
+            values.push_back(nodes[i].y + b * (x - nodes[i].x) + c[i] * (x - nodes[i].x) * (x - nodes[i].x) + d * (x - nodes[i].x) * (x - nodes[i].x) * (x - nodes[i].x));
         }
     }
 
@@ -143,7 +143,7 @@ vector<long double> diffForward(long double x, vector<node> nodes){
 
     for (int i = 0; i < diffs.size() - 1; ++i){
         if (nodes[i].x <= x && nodes[i + 1].x > x){
-//            values.push_back(((x - nodes[i].x) * (diffs[i + 1] - diffs[i])) / (nodes[i + 1].x - nodes[i].x) + diffs[i]);
+            values.push_back(((x - nodes[i].x) * (diffs[i + 1] - diffs[i])) / (nodes[i + 1].x - nodes[i].x) + diffs[i]);
         }
     }
     return values;
@@ -159,7 +159,7 @@ vector<long double> diffBackward(long double x, vector<node> nodes){
 
     for (int i = 1; i < diffs.size(); ++i){
         if (nodes[i].x <= x && nodes[i + 1].x > x){
-//            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
+            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
         }
     }
     return values;
@@ -175,7 +175,7 @@ vector<long double> diffCentral(long double x, vector<node> nodes){
 
     for (int i = 1; i < diffs.size(); ++i){
         if (nodes[i].x <= x && nodes[i + 1].x > x){
-//            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
+            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
         }
     }
     return values;
@@ -183,52 +183,34 @@ vector<long double> diffCentral(long double x, vector<node> nodes){
 
 vector<long double> hdiffForward(long double x, vector<node> nodes){
     vector<long double> values;
-    vector<long double> diffs;
-    long double h = 0.001;
+    long double h = 0.00001;
 
-    for (int i = 0; i < nodes.size() - 1; ++i) {
-        diffs.push_back((nodes[i + 1].y - nodes[i].y) / (nodes[i + 1].x - nodes[i].x));
-    }
-
-    for (int i = 0; i < diffs.size() - 1; ++i){
-        if (nodes[i].x <= x && nodes[i + 1].x > x){
-            values.push_back(((x - nodes[i].x) * (diffs[i + 1] - diffs[i])) / (nodes[i + 1].x - nodes[i].x) + diffs[i]);
-        }
-    }
+    vector<long double> y0 = splineInterpolation(x, nodes);
+    vector<long double> y1 = splineInterpolation(x + h, nodes);
+    if(!y0.empty() && !y1.empty())
+        values.push_back((y1[0]-y0[0])/h);
     return values;
 }
 
 vector<long double> hdiffBackward(long double x, vector<node> nodes){
     vector<long double> values;
-    vector<long double> diffs;
-    long double h = 0.001;
+    long double h = 0.00001;
 
-    for (int i = 1; i < nodes.size(); ++i) {
-        diffs.push_back((nodes[i].y - nodes[i - 1].y) / (nodes[i].x - nodes[i - 1].x));
-    }
-
-    for (int i = 1; i < diffs.size(); ++i){
-        if (nodes[i].x <= x && nodes[i + 1].x > x){
-            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
-        }
-    }
+    vector<long double> y0 = splineInterpolation(x - h, nodes);
+    vector<long double> y1 = splineInterpolation(x, nodes);
+    if(!y0.empty() && !y1.empty())
+        values.push_back((y1[0]-y0[0])/h);
     return values;
 }
 
 vector<long double> hdiffCentral(long double x, vector<node> nodes){
     vector<long double> values;
-    vector<long double> diffs;
-    long double h = 0.001;
+    long double h = 0.00001;
 
-    for (int i = 1; i < nodes.size() - 1; ++i) {
-        diffs.push_back((nodes[i + 1].y - nodes[i - 1].y) / (nodes[i + 1].x - nodes[i - 1].x));
-    }
-
-    for (int i = 1; i < diffs.size(); ++i){
-        if (nodes[i].x <= x && nodes[i + 1].x > x){
-            values.push_back(((x - nodes[i].x) * (diffs[i] - diffs[i - 1])) / (nodes[i + 1].x - nodes[i].x) + diffs[i - 1]);
-        }
-    }
+    vector<long double> y0 = splineInterpolation(x - h, nodes);
+    vector<long double> y1 = splineInterpolation(x + h, nodes);
+    if(!y0.empty() && !y1.empty())
+        values.push_back((y1[0]-y0[0])/(2*h));
     return values;
 }
 

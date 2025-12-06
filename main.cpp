@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 
     //размеры окна и размер клетки
     int HEIGHT = 1000;
-    int WIDTH = 1500;
+    int WIDTH = 700;
     int SCALE = 25;
 
     //перезаписываем параметры окна из аргументов программы
@@ -125,6 +125,10 @@ int main(int argc, char** argv) {
         long double lastIntT = 0;
         long double lastIntS = 0;
 
+        long double maxDiffF = 0;
+        long double maxDiffB = 0;
+        long double maxDiffC = 0;
+
 
         for (int x = 0; x < WIDTH; ++x) {
             //считаем текущую координату x с поправкой на смещение осей
@@ -134,7 +138,7 @@ int main(int argc, char** argv) {
             vector<long double> linear = linearInterpolation(curX / SCALE, nodes);
             vector<long double> lagrange = lagrangeInterpolation(curX / SCALE, nodes);
             vector<long double> newton = newtonInterpolation(curX / SCALE, nodes);
-            vector<long double> spline = splineInterpolation(curX / SCALE, nodes);
+            vector<long double> spline = {};// splineInterpolation(curX / SCALE, nodes);
             vector<long double> diffF = diffForward(curX / SCALE, nodes);
             vector<long double> diffB = diffBackward(curX / SCALE, nodes);
             vector<long double> diffC = diffCentral(curX / SCALE, nodes);
@@ -146,6 +150,13 @@ int main(int argc, char** argv) {
             vector<long double> intC = integralCentral(curX / SCALE, nodes);
             vector<long double> intT = integralTrap(curX / SCALE, nodes);
             vector<long double> intS = integralSimpson(curX / SCALE, nodes);
+
+            if(!diffF.empty() && !hdiffF.empty() && abs(diffF[0] - hdiffF[0]) > maxDiffF)
+                maxDiffF = abs(diffF[0] - hdiffF[0]);
+            if(!diffB.empty() && !hdiffB.empty() && abs(diffB[0] - hdiffB[0]) > maxDiffF)
+                maxDiffB = abs(diffB[0] - hdiffB[0]);
+            if(!diffC.empty() && !hdiffC.empty() && abs(diffC[0] - hdiffC[0]) > maxDiffC)
+                maxDiffC = abs(diffC[0] - hdiffC[0]);
 
             //рисуем точки функции
             for (int i = 0; i < linear.size(); ++i) {
@@ -385,8 +396,9 @@ int main(int argc, char** argv) {
             SDL_UpdateWindowSurface(window);
         }
 
-
-
+        cout << "maxDiffF " << maxDiffF << endl;
+        cout << "maxDiffB " << maxDiffB << endl;
+        cout << "maxDiffC " << maxDiffC << endl;
 
 
         SDL_UpdateWindowSurface(window);
