@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include "build/libs/sdl2/include/SDL.h"
 #include "include/InterpolatedFunctions.h"
 
@@ -9,6 +10,17 @@ const int COLOR_WHITE = 2147483647;
 const int COLOR_GRAY = 1002159035;
 const int COLOR_RED = 16711680;
 const int COLOR_BLACK = 0;
+
+//рисуем шарик
+void drawBall(int x, int y, int h, int w, int r, Uint32* pixels){
+    for (int i = -r; i < r; ++i) {
+        for (int j = -r; j < r; ++j) {
+            if(y+i >= 0 && y+i < h && x+j >= 0 && x+j < w && sqrt(i*i + j*j) <= r) {
+                pixels[(y + i) * w + x + j] = COLOR_RED;
+            }
+        }
+    }
+}
 
 //рисуем белый фон
 void drawSurface(Uint32* pixels, int h, int w){
@@ -172,18 +184,15 @@ int main(int argc, char** argv) {
                     if(j >= 0 && j < HEIGHT) {
                         for (int k = -1; k < 2; ++k) {
                             for (int l = -1; l < 2; ++l) {
-                                uint32_t color = 0;
-                                color |= static_cast<uint32_t>(abs(diff) * 255 / 550) << 24;            //a
-                                color |= static_cast<uint32_t>(abs(diff) * 255 / 550) << 16;            //r
-                                color |= static_cast<uint32_t>(abs(diff) * 255 / 550) << 8;             //g
-                                color |= static_cast<uint32_t>(abs(diff) * 255 / 550);                  //b
-                                pixels[((int) j + k) * WIDTH + x + l] = color;
+                                pixels[((int) j + k) * WIDTH + x + l] = COLOR_BLACK;
                             }
                         }
                     }
                 }
                 lastLinear = y;
             }
+
+            drawBall(100, 100, HEIGHT, WIDTH, 30, pixels);
 //            for (int i = 0; i < linear.size(); ++i) {
 //                //вычисляем значение функции с поправкой на смещение осей
 //                long double y = linear[i] * SCALE + HEIGHT / 2;
