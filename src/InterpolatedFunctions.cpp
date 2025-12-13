@@ -39,7 +39,7 @@ vector<long double> lagrangeInterpolation(long double x, vector<node> nodes){
 
         summValue += nodes[i].y * proizv;
     }
-//    values.push_back(summValue);
+    values.push_back(summValue);
     return values;
 }
 
@@ -65,7 +65,7 @@ vector<long double> newtonInterpolation(long double x, vector<node> nodes){
 
         summValue += proizv * razdRaz;
     }
-//    values.push_back(summValue);
+    values.push_back(summValue);
     return values;
 }
 
@@ -130,6 +130,82 @@ vector<long double> splineInterpolation(long double x, vector<node> nodes){
         }
     }
 
+    return values;
+}
+
+
+vector<long double> splineAndDiffInterpolation(long double x, vector<node> nodes){
+    vector<long double> values;
+
+
+    //инициализируем матрицу
+    vector<vector<long double>> slau;
+    for (int i = 0; i < nodes.size(); ++i) {
+        vector<long double> row;
+        for (int j = 0; j < nodes.size(); ++j) {
+            row.push_back(0);
+        }
+        slau.push_back(row);
+    }
+    //заполняем матрицу
+    slau[0][0] = 1;
+    slau[nodes.size() - 1][nodes.size() - 1] = 1;
+    for (int i = 1; i < nodes.size() - 1; ++i) {
+        slau[i][i-1] = nodes[i].x - nodes[i - 1].x;
+        slau[i][i+1] = nodes[i + 1].x - nodes[i].x;
+        slau[i][i] = 2 * (slau[i][i-1] + slau[i][i+1]);
+    }
+
+    //считаем правую часть и добавляем в матрицу
+    slau[0].push_back(0);
+    for (int i = 1; i < nodes.size() - 1; ++i){
+        slau[i].push_back(3 * ((nodes[i + 1].y - nodes[i].y)/ (nodes[i + 1].x - nodes[i].x) - (nodes[i].y - nodes[i - 1].y) / (nodes[i].x - nodes[i - 1].x)));
+    }
+    slau[slau.size() - 1].push_back(0);
+
+    //зануляем столбцы
+    for (int row = 1; row < nodes.size(); ++row) {
+        for (int i = row; i < slau.size(); ++i) {
+            long double mnozh = slau[i][row-1] / slau[row-1][row-1];
+            for (int j = row-1; j < slau[0].size(); ++j) {
+                slau[i][j] -= mnozh * slau[row-1][j];
+            }
+            slau[i][row-1] = 0;
+        }
+    }
+
+    vector<long double> c;
+    for (int i = 0; i < nodes.size(); ++i) {
+        c.push_back(0);
+    }
+
+    for (int i = nodes.size() - 1; i >= 0; --i) {
+        long double sum = 0;
+        for (int j = 0; j < c.size(); ++j) {
+            sum += c[j] * slau[i][j];
+        }
+        c[i] = (slau[i][slau[i].size() - 1] - sum) / slau[i][i];
+    }
+
+    long double h = 0.001;
+    long double xh = 0;
+    for (int i = 0; i < nodes.size() - 1; ++i){
+        if (min(nodes[i].x, nodes[i + 1].x) <= x && max(nodes[i].x, nodes[i + 1].x) > x){
+            long double d = (c[i+1] - c[i]) / (3 * (nodes[i + 1].x - nodes[i].x));
+            long double b = (nodes[i+1].y - nodes[i].y) / (nodes[i + 1].x - nodes[i].x) - (nodes[i + 1].x - nodes[i].x) * (2 * c[i] + c[i+1]) / 3;
+            values.push_back(nodes[i].y + b * (x - nodes[i].x) + c[i] * (x - nodes[i].x) * (x - nodes[i].x) + d * (x - nodes[i].x) * (x - nodes[i].x) * (x - nodes[i].x));
+            xh = nodes[i].y + b * (x+h - nodes[i].x) + c[i] * (x+h - nodes[i].x) * (x+h - nodes[i].x) + d * (x+h - nodes[i].x) * (x+h - nodes[i].x) * (x+h - nodes[i].x);
+        }
+    }
+
+    if(!values.empty() && x + h <= nodes[nodes.size()-1].x){
+        long double y0 = values[0];
+        long double y1 = xh;
+        values.push_back((y1-y0)/(h+h));
+    }
+    else{
+        values.push_back(0);
+    }
     return values;
 }
 
@@ -205,7 +281,7 @@ vector<long double> hdiffBackward(long double x, vector<node> nodes){
 
 vector<long double> hdiffCentral(long double x, vector<node> nodes){
     vector<long double> values;
-    long double h = 0.00001;
+    long double h = 0.001;
 
     vector<long double> y0 = splineInterpolation(x - h, nodes);
     vector<long double> y1 = splineInterpolation(x + h, nodes);
@@ -225,7 +301,7 @@ vector<long double> integralLeft(long double x, vector<node> nodes){
 
     for (int i = 0; i < nodes.size() - 1; ++i){
         if (nodes[i].x <= x && nodes[i + 1].x > x){
-//            values.push_back(nodes[i].y);
+            values.push_back(nodes[i].y);
         }
     }
     return values;
@@ -242,7 +318,7 @@ vector<long double> integralRight(long double x, vector<node> nodes){
 
     for (int i = 0; i < nodes.size() - 1; ++i){
         if (nodes[i].x <= x && nodes[i + 1].x > x){
-//            values.push_back(nodes[i + 1].y);
+            values.push_back(nodes[i + 1].y);
         }
     }
     return values;
@@ -259,7 +335,7 @@ vector<long double> integralCentral(long double x, vector<node> nodes){
 
     for (int i = 1; i < nodes.size() - 1; i+=2){
         if (nodes[i - 1].x <= x && nodes[i + 1].x > x){
-//            values.push_back(nodes[i].y);
+            values.push_back(nodes[i].y);
         }
     }
     return values;
@@ -276,7 +352,7 @@ vector<long double> integralTrap(long double x, vector<node> nodes){
 
     for (int i = 0; i < nodes.size() - 1; ++i){
         if (min(nodes[i].x, nodes[i + 1].x) <= x && max(nodes[i].x, nodes[i + 1].x) > x){
-//            values.push_back(((x - nodes[i].x) * (nodes[i + 1].y - nodes[i].y)) / (nodes[i + 1].x - nodes[i].x) + nodes[i].y);
+            values.push_back(((x - nodes[i].x) * (nodes[i + 1].y - nodes[i].y)) / (nodes[i + 1].x - nodes[i].x) + nodes[i].y);
         }
     }
     return values;
@@ -328,7 +404,7 @@ vector<long double> integralSimpson(long double x, vector<node> nodes){
             a2 = (slau[0][3] - a0 *  slau[0][2] - a1 *  slau[0][1]) / slau[0][0];
 
 
-//            values.push_back(a0 + a1*x + a2*x*x);
+            values.push_back(a0 + a1*x + a2*x*x);
         }
     }
     return values;
