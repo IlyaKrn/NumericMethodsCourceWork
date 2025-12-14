@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <thread>
 #include "build/libs/sdl2/include/SDL.h"
 #include "include/InterpolatedFunctions.h"
 
@@ -106,6 +107,10 @@ int main(int argc, char** argv) {
     //рисуем белый фон
     drawSurface(pixels, HEIGHT, WIDTH);
 
+    //сохраняем значения сплайна и производной
+    vector<long double> splineVals;
+    vector<long double> diffVals;
+
     //рисуем графики и считываем действия пользователя
     while (true){
         //читаем действия пользователя
@@ -142,28 +147,54 @@ int main(int argc, char** argv) {
         long double maxDiffB = 0;
         long double maxDiffC = 0;
 
+        //рисуем движение шарика
+        if(!splineVals.empty()){
+            vector<long double> speeds;
+            //ищем максимальную точку и задаем начальную энергию
+            long double maxPoint = 0;
+            long double m = 1;
+            long double g = 90;
+            long double v0 = 1;
+            for (int i = 0; i < splineVals.size(); ++i) {
+                if(HEIGHT - splineVals[i] > maxPoint)
+                    maxPoint = HEIGHT - splineVals[i];
+            }
+            long double totalEnergy = m*v0*v0/2 + m*g*maxPoint;
+            cout << totalEnergy;
+            for (int i = 0; i < splineVals.size() - 1; ++i) {
+                long double speed = sqrt(2*(totalEnergy/m - g*(HEIGHT-splineVals[i])));
+//                drawBall(i+SCALE, speed, HEIGHT, WIDTH, 2, pixels);
+//                drawBall(i+SCALE, splineVals[i], HEIGHT, WIDTH, 2, pixels);
+                speeds.push_back(speed);
+                SDL_UpdateWindowSurface(window);
+            }
+            //
+        }
 
-        for (int x = 0; x < WIDTH; ++x) {
-            //считаем текущую координату x с поправкой на смещение осей
-            float curX = x - SCALE;
 
-            //получаем координаты точек для текущего x
-            vector<long double> linear = {};//linearInterpolation(curX / SCALE, nodes);
-            vector<long double> lagrange = {};//lagrangeInterpolation(curX / SCALE, nodes);
-            vector<long double> newton = {};//newtonInterpolation(curX / SCALE, nodes);
-            vector<long double> spline = {};//splineInterpolation(curX / SCALE, nodes);
-            vector<long double> splineAndDiff = splineAndDiffInterpolation(curX / SCALE, nodes);
-            vector<long double> diffF = {};//diffForward(curX / SCALE, nodes);
-            vector<long double> diffB = {};//diffBackward(curX / SCALE, nodes);
-            vector<long double> diffC = {};//diffCentral(curX / SCALE, nodes);
-            vector<long double> hdiffF = {};//hdiffForward(curX / SCALE, nodes);
-            vector<long double> hdiffB = {};//hdiffBackward(curX / SCALE, nodes);
-            vector<long double> hdiffC = {};//hdiffCentral(curX / SCALE, nodes);
-            vector<long double> intF = {};//integralLeft(curX / SCALE, nodes);
-            vector<long double> intB = {};//integralRight(curX / SCALE, nodes);
-            vector<long double> intC = {};//integralCentral(curX / SCALE, nodes);
-            vector<long double> intT = {};//integralTrap(curX / SCALE, nodes);
-            vector<long double> intS = {};//integralSimpson(curX / SCALE, nodes);
+        //рисуем функцию и записываем значения один раз
+        if(splineVals.empty()) {
+            for (int x = 0; x < WIDTH; ++x) {
+                //считаем текущую координату x с поправкой на смещение осей
+                float curX = x - SCALE;
+
+                //получаем координаты точек для текущего x
+                vector<long double> linear = {};//linearInterpolation(curX / SCALE, nodes);
+                vector<long double> lagrange = {};//lagrangeInterpolation(curX / SCALE, nodes);
+                vector<long double> newton = {};//newtonInterpolation(curX / SCALE, nodes);
+                vector<long double> spline = {};//splineInterpolation(curX / SCALE, nodes);
+                vector<long double> splineAndDiff = splineAndDiffInterpolation(curX / SCALE, nodes);
+                vector<long double> diffF = {};//diffForward(curX / SCALE, nodes);
+                vector<long double> diffB = {};//diffBackward(curX / SCALE, nodes);
+                vector<long double> diffC = {};//diffCentral(curX / SCALE, nodes);
+                vector<long double> hdiffF = {};//hdiffForward(curX / SCALE, nodes);
+                vector<long double> hdiffB = {};//hdiffBackward(curX / SCALE, nodes);
+                vector<long double> hdiffC = {};//hdiffCentral(curX / SCALE, nodes);
+                vector<long double> intF = {};//integralLeft(curX / SCALE, nodes);
+                vector<long double> intB = {};//integralRight(curX / SCALE, nodes);
+                vector<long double> intC = {};//integralCentral(curX / SCALE, nodes);
+                vector<long double> intT = {};//integralTrap(curX / SCALE, nodes);
+                vector<long double> intS = {};//integralSimpson(curX / SCALE, nodes);
 
 //            if(!diffF.empty() && !hdiffF.empty() && abs(diffF[0] - hdiffF[0]) > maxDiffF)
 //                maxDiffF = abs(diffF[0] - hdiffF[0]);
@@ -172,27 +203,27 @@ int main(int argc, char** argv) {
 //            if(!diffC.empty() && !hdiffC.empty() && abs(diffC[0] - hdiffC[0]) > maxDiffC)
 //                maxDiffC = abs(diffC[0] - hdiffC[0]);
 //
-            //рисуем точки функции
-            if(splineAndDiff.size() >= 2){
-                long double y = splineAndDiff[0] * SCALE + SCALE;
-                long double diff = splineAndDiff[1] * SCALE;
-                if (y < 0) y = 0;
-                if (y >= HEIGHT) y = HEIGHT - 1;
-                cout << diff << endl;
-                //рисуем если помещается на поле
-                for (int j = min(y, lastLinear); j <= max(y, lastLinear); ++j) {
-                    if(j >= 0 && j < HEIGHT) {
-                        for (int k = -1; k < 2; ++k) {
-                            for (int l = -1; l < 2; ++l) {
-                                pixels[((int) j + k) * WIDTH + x + l] = COLOR_BLACK;
+                //рисуем точки функции
+                if (splineAndDiff.size() >= 2) {
+                    long double y = splineAndDiff[0] * SCALE + SCALE;
+                    long double diff = splineAndDiff[1] * SCALE;
+                    splineVals.push_back(y);
+                    diffVals.push_back(diff);
+                    if (y < 0) y = 0;
+                    if (y >= HEIGHT) y = HEIGHT - 1;
+                    //рисуем если помещается на поле
+                    for (int j = min(y, lastLinear); j <= max(y, lastLinear); ++j) {
+                        if (j >= 0 && j < HEIGHT) {
+                            for (int k = -1; k < 2; ++k) {
+                                for (int l = -1; l < 2; ++l) {
+                                    pixels[((int) j + k) * WIDTH + x + l] = COLOR_BLACK;
+                                }
                             }
                         }
                     }
+                    lastLinear = y;
                 }
-                lastLinear = y;
-            }
 
-            drawBall(100, 100, HEIGHT, WIDTH, 30, pixels);
 //            for (int i = 0; i < linear.size(); ++i) {
 //                //вычисляем значение функции с поправкой на смещение осей
 //                long double y = linear[i] * SCALE + HEIGHT / 2;
@@ -427,7 +458,8 @@ int main(int argc, char** argv) {
 //                lastIntS = y;
 //            }
 
-            SDL_UpdateWindowSurface(window);
+                SDL_UpdateWindowSurface(window);
+            }
         }
 
 //        cout << "maxDiffF " << maxDiffF << endl;
