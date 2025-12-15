@@ -13,11 +13,11 @@ const int COLOR_RED = 16711680;
 const int COLOR_BLACK = 0;
 
 //рисуем шарик
-void drawBall(int x, int y, int h, int w, int r, Uint32* pixels){
+void drawBall(int x, int y, int h, int w, int r, Uint32* pixels, int color){
     for (int i = -r; i < r; ++i) {
         for (int j = -r; j < r; ++j) {
             if(y+i >= 0 && y+i < h && x+j >= 0 && x+j < w && sqrt(i*i + j*j) <= r) {
-                pixels[(y + i) * w + x + j] = COLOR_RED;
+                pixels[(y + i) * w + x + j] = color;
             }
         }
     }
@@ -149,23 +149,35 @@ int main(int argc, char** argv) {
 
         //рисуем движение шарика
         if(!splineVals.empty()){
-            vector<long double> speeds;
+            long double frameTime = 0;
+
             //ищем максимальную точку и задаем начальную энергию
             long double maxPoint = 0;
             long double m = 1;
-            long double g = 90;
+            long double g = 30;
             long double v0 = 1;
-            for (int i = 0; i < splineVals.size(); ++i) {
+            for (int i = 0; i < splineVals.size() - 200; ++i) {
                 if(HEIGHT - splineVals[i] > maxPoint)
                     maxPoint = HEIGHT - splineVals[i];
             }
             long double totalEnergy = m*v0*v0/2 + m*g*maxPoint;
-            cout << totalEnergy;
-            for (int i = 0; i < splineVals.size() - 1; ++i) {
+            int vectNapr = 1;
+            int lastBall = 0;
+            for (int i = 1; i > 0 && i < splineVals.size() - 1; i+=vectNapr) {
+                if(2*(totalEnergy/m - g*(HEIGHT-splineVals[i])) <= 0) {
+                    vectNapr = -vectNapr;
+                    continue;
+                }
                 long double speed = sqrt(2*(totalEnergy/m - g*(HEIGHT-splineVals[i])));
-//                drawBall(i+SCALE, speed, HEIGHT, WIDTH, 2, pixels);
-//                drawBall(i+SCALE, splineVals[i], HEIGHT, WIDTH, 2, pixels);
-                speeds.push_back(speed);
+                long double dS = sqrt(1+pow(splineVals[i+vectNapr] - splineVals[i], 2));
+                frameTime += dS/speed;
+                if(frameTime > 0.5){
+                    std::this_thread::sleep_for(std::chrono::milliseconds((int)(frameTime*50)));
+                    drawBall(lastBall+SCALE, splineVals[lastBall], HEIGHT, WIDTH, 10, pixels, COLOR_WHITE);
+                    lastBall = i;
+                    drawBall(i+SCALE, splineVals[i], HEIGHT, WIDTH, 10, pixels, COLOR_RED);
+                    frameTime = 0;
+                }
                 SDL_UpdateWindowSurface(window);
             }
             //
