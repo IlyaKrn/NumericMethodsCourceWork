@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
             long double m = 1;
             long double g = 9.8;
             long double v0 = 1;
-            for (int i = 0; i < splineVals.size() - 200; ++i) {
+            for (int i = 0; i < splineVals.size() - SCALE; ++i) {
                 if(HEIGHT - splineVals[i] > maxPoint)
                     maxPoint = HEIGHT - splineVals[i];
             }
@@ -172,10 +172,25 @@ int main(int argc, char** argv) {
                 long double dS = sqrt(1+pow(splineVals[i+vectNapr] - splineVals[i], 2));
 //                totalEnergy -= dS;
                 frameTime += dS/speed;
-                if(frameTime > 0.5){
-                    std::this_thread::sleep_for(std::chrono::milliseconds((int)(frameTime*50)));
-                    drawBall(lastBall+SCALE, splineVals[lastBall], HEIGHT, WIDTH, 10, pixels, COLOR_WHITE);
+                if(frameTime > 1){
+                    //чистим прошлый шарик и рисуем всё заново
+                    drawBall(lastBall+SCALE, splineVals[lastBall], HEIGHT, WIDTH, 12, pixels, COLOR_WHITE);
+                    drawField(pixels, HEIGHT, WIDTH, SCALE);
+                    for (int j = 0; j < splineVals.size(); ++j) {
+                        for (int k = min(splineVals[j], lastLinear); k <= max(splineVals[j], lastLinear); ++k) {
+                            if (k >= 0 && k < HEIGHT) {
+                                for (int kk = -1; kk < 2; ++kk) {
+                                    for (int l = -1; l < 2; ++l) {
+                                        pixels[((int) k + kk) * WIDTH + SCALE + j + l] = COLOR_BLACK;
+                                    }
+                                }
+                            }
+                        }
+                        lastLinear = splineVals[j];
+                    }
                     lastBall = i;
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds((int)(50)));
                     drawBall(i+SCALE, splineVals[i], HEIGHT, WIDTH, 10, pixels, COLOR_RED);
                     frameTime = 0;
                 }
