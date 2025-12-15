@@ -154,7 +154,7 @@ int main(int argc, char** argv) {
             //ищем максимальную точку и задаем начальную энергию
             long double maxPoint = 0;
             long double m = 1;
-            long double g = 30;
+            long double g = 9.8;
             long double v0 = 1;
             for (int i = 0; i < splineVals.size() - 200; ++i) {
                 if(HEIGHT - splineVals[i] > maxPoint)
@@ -170,6 +170,7 @@ int main(int argc, char** argv) {
                 }
                 long double speed = sqrt(2*(totalEnergy/m - g*(HEIGHT-splineVals[i])));
                 long double dS = sqrt(1+pow(splineVals[i+vectNapr] - splineVals[i], 2));
+//                totalEnergy -= dS;
                 frameTime += dS/speed;
                 if(frameTime > 0.5){
                     std::this_thread::sleep_for(std::chrono::milliseconds((int)(frameTime*50)));
